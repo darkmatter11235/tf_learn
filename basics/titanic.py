@@ -24,7 +24,8 @@ n_hidden_1 = 256
 n_hideen_2 = 256
 n_input = df.shape[1]-1
 n_classes = 2
-
+real_input = df.as_matrix()
+print(real_input.shape)
 #tf Graph input
 x = tf.placeholder("float", [None, n_input])
 y = tf.placeholder("float", [None, n_classes])
@@ -60,15 +61,16 @@ optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 
 #init all variables
 init = tf.global_variables_initializer()
-
-with tf.Session() as session:
-	merged = tf.summary.merge_all()
-	writer = tf.summary.FileWriter("/tmp/titanic", session.graph)
-	session.run(init)
-	session.run(writer)
-print(n_input)
+#print(n_input)
 #print(cols)
 #print(df['Embarked'].unique())
 #print(df.head())
 #print(df.info())
 #print(df.shape[1])
+with tf.Session() as session:
+	merged = tf.summary.merge_all()
+	writer = tf.summary.FileWriter("/tmp/titanic", session.graph)
+	init = tf.global_variables_initializer()
+	_, c = session.run([optimizer, cost], feed_dict={x: real_input[2:], y: real_input[1]})
+	print(c)
+

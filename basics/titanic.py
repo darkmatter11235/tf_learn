@@ -3,7 +3,6 @@ import tensorflow as tf
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from tensorflow.python.ops.metrics_impl import accuracy
 
 df = pd.read_csv("data/train.csv")
 

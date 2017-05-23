@@ -1,3 +1,4 @@
+from pyparsing import delimitedList
 from tensorflow.python import debug as tf_debug
 import tensorflow as tf
 import pandas as pd
@@ -23,8 +24,9 @@ test_data = test_data.dropna()
 test_data['Gender'] = test_data['Sex'].map({'female': 0, 'male': 1}).astype(int)
 test_data['Port'] = test_data['Embarked'].map({'C': 0, 'S': 1, 'Q': 2}).astype(int)
 test_data = test_data.drop(['Sex', 'Embarked'], axis=1)
+test_data_columns = test_data.columns
 test_data = test_data.as_matrix()
-# print(test_data)
+
 
 # parameters
 learning_rate = 0.005
@@ -34,7 +36,7 @@ display_step = 1
 
 # Network parameters
 n_hidden_1 = 32
-n_hideen_2 = 32
+n_hidden_2 = 32
 n_input = df.shape[1] - 2
 n_classes = 2
 real_input = df.as_matrix()
@@ -62,13 +64,13 @@ def multilayer_perceptron(x, weights, biases):
 
 weights = {
     'h1': tf.Variable(tf.random_normal([n_input, n_hidden_1]), name='l1_weights'),
-    'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hideen_2]), name='l2_weights'),
-    'out': tf.Variable(tf.random_normal([n_hideen_2, n_classes]), name='out_weights')
+    'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2]), name='l2_weights'),
+    'out': tf.Variable(tf.random_normal([n_hidden_2, n_classes]), name='out_weights')
 }
 
 biases = {
     'b1': tf.Variable(tf.random_normal([n_hidden_1]), name='l1_biases'),
-    'b2': tf.Variable(tf.random_normal([n_hideen_2]), name='l2_biases'),
+    'b2': tf.Variable(tf.random_normal([n_hidden_2]), name='l2_biases'),
     'out': tf.Variable(tf.random_normal([n_classes]), name='out_biases')
 }
 
@@ -109,4 +111,8 @@ with tf.Session() as session:
     predicted_data = tf.concat([tf.cast(test_data, "float"), output_value], 1)
     print("Training Accuracy:", accuracy.eval({x:real_input[:,2:], y: tout}))
     test_predictions = predicted_data.eval({x:test_data[:,1:]})
+    # test_predictions = np.concatenate(test_data_columns, test_predictions)
     print(test_predictions[:5, :])
+    np.savetxt("predictions.csv", test_data_columns, delimiter=",", fmt='%s')
+    f = open('predictions.csv', 'ab')
+    np.savetxt(f,test_predictions, delimiter=",", fmt='%f')
